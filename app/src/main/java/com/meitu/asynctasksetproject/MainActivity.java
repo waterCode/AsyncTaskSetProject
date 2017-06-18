@@ -14,8 +14,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         AsyncTaskManager asyncTaskManager = new AsyncTaskManager();
-        AsyncTaskSet taskSet1 =new AsyncTaskSet();
-        AsyncTaskSet taskSet2 =new AsyncTaskSet();
+        AsyncTaskSet taskSet1 = new AsyncTaskSet();
+        AsyncTaskSet taskSet2 = new AsyncTaskSet();
         taskSet1.addTask(new MyTask1());
         taskSet1.addTask(new MyTask1());
         taskSet1.addTask(new MyTask1());
@@ -36,22 +36,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    class MyTask1 extends AsyncTask{
+    class MyTask1 extends AsyncTask {
 
 
         @Override
         protected Object doInBackground(Object[] params) {
-            Log.d("MyTask","params:111");
+            Log.d("MyTask", "params:111");
             return null;
         }
     }
 
-    class MyTask2 extends AsyncTask{
+    class MyTask2 extends AsyncTask {
 
 
         @Override
         protected Void doInBackground(Object[] params) {
-            Log.d("MyTask","params:222");
+            Log.d("MyTask", "params:222");
             return null;
         }
     }
