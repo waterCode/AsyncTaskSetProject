@@ -30,8 +30,10 @@ public class MainActivity extends AppCompatActivity {
         taskSet2.addTask(new MyTask2());
         taskSet2.addTask(new MyTask2());
         taskSet2.addTask(new MyTask2());
+        taskSet2.addTask(new MyTask3());
         asyncTaskManager.execute(taskSet1);
         asyncTaskManager.execute(taskSet2);
+        //new MyTask3().execute();
 
     }
 
@@ -53,6 +55,20 @@ public class MainActivity extends AppCompatActivity {
         protected Void doInBackground(Object[] params) {
             Log.d("MyTask", "params:222");
             return null;
+        }
+    }
+
+    class MyTask3 extends AsyncTask<Integer,Integer,Integer>{
+
+        @Override
+        protected Integer doInBackground(Integer... params) {
+            Log.d("MyTask3","");
+            return 0;
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            super.onPostExecute(integer);
         }
     }
 }

@@ -10,17 +10,17 @@ import java.util.List;
  */
 
 public class AsyncTaskSet {
-    private List<AsyncTask> taskList;
+    private List<AsyncTask<?,?,?>> taskList;
 
     public AsyncTaskSet() {
         this.taskList = new ArrayList<>();
     }
 
-    public void addTask(AsyncTask task){
+    public void addTask(AsyncTask<?,?,?> task){
         taskList.add(task);
     }
 
-    public List<AsyncTask> getTaskList() {
+    public List<AsyncTask<?,?,?>> getTaskList() {
         return taskList;
     }
 

@@ -54,7 +54,7 @@ public class AsyncTaskManager {
             CountDownLatch latch = new CountDownLatch(mActive.getSize());
             executor.setLatch(latch);
             //遍历任务，开始执行
-            for (AsyncTask task : mActive.getTaskList()) {
+            for (AsyncTask<?,?,?> task : mActive.getTaskList()) {
                 task.executeOnExecutor(executor);
             }
             //阻塞当前线程
