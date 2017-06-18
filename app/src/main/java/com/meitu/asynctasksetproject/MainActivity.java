@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
         taskSet1.addTask(new MyTask1());
         taskSet1.addTask(new MyTask1());
         taskSet1.addTask(new MyTask1());
+
         taskSet2.addTask(new MyTask2());
         taskSet2.addTask(new MyTask2());
         taskSet2.addTask(new MyTask2());

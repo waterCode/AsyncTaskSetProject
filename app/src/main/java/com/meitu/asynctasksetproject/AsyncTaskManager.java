@@ -36,7 +36,6 @@ public class AsyncTaskManager {
                 @Override
                 public void run() {
                     scheduleNext();
-
                 }
             }).start();
         }
@@ -44,13 +43,16 @@ public class AsyncTaskManager {
 
 
 
-
-    private void scheduleNext(){
+/*
+有毒，不同步后果很严重。。。。。。。。。。。。。。。。。。。。。。。。。。
+ */
+    private synchronized void  scheduleNext(){
         Log.d(TAG,"excute");
         try {
             //拿到一个任务
             mActive=taskSetQueue.takeLast();
             //初始化障碍器
+            int size=mActive.getSize();
             CountDownLatch latch=new CountDownLatch(mActive.getSize());
             executor.setmLatch(latch);
             //遍历任务，开始执行
