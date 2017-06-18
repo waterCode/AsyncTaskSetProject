@@ -23,11 +23,12 @@ public class AsyncTaskManager {
     private static final String TAG = "AsncTaskManger";
     private BlockingDeque<AsyncTaskSet> taskSetQueue = new LinkedBlockingDeque<>();
     private AsyncTaskSet mActive;//当前执行任务
-    private MyExecutor executor;
+    public static final MyExecutor executor;
 
-    public AsyncTaskManager() {
+    static {
         executor = new MyExecutor();
     }
+
 
     public void execute(AsyncTaskSet taskSet) {
         taskSetQueue.addFirst(taskSet);
@@ -54,9 +55,8 @@ public class AsyncTaskManager {
             CountDownLatch latch = new CountDownLatch(mActive.getSize());
             executor.setLatch(latch);
             //遍历任务，开始执行
-            for (AsyncTask<?,?,?> task : mActive.getTaskList()) {
-                task.executeOnExecutor(executor);
-            }
+            mActive.executeTasks();
+
             //阻塞当前线程
             latch.await();
             scheduleNext();
@@ -68,7 +68,7 @@ public class AsyncTaskManager {
     }
 
 
-    private static class MyExecutor implements Executor {
+    public static class MyExecutor implements Executor {
 
         private final String TAG = "Myexecutor";
         CountDownLatch mLatch;
