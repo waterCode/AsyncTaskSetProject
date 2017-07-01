@@ -63,8 +63,19 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Object doInBackground(Object[] params) {
-            Log.d("MyTask", "params:111");
+            Log.d("MyTask1", "task1 doing in background");
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+            Log.d("MyTask", "task1 finished");
         }
     }
 
@@ -73,8 +84,20 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Object[] params) {
-            Log.d("MyTask", "params:222");
+            Log.d("MyTask2", "task2 doing in background");
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+            Log.d("MyTask2", "task2 finished");
         }
     }
 
@@ -82,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Integer doInBackground(Integer... params) {
-            Log.d("MyTask3","33");
+            Log.d("MyTask3","task3 doing in background");
             return 0;
         }
 

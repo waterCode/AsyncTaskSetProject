@@ -45,6 +45,7 @@ public class AsyncTaskManager {
 
     /*
     有毒，不同步后果很严重。。。。。。。。。。。。。。。。。。。。。。。。。。
+    有无线递归情况
      */
     private synchronized void scheduleNext() {
         Log.d(TAG, "excute");
@@ -60,10 +61,10 @@ public class AsyncTaskManager {
             //阻塞当前线程
             latch.await();
             scheduleNext();
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
 
     }
 
