@@ -48,7 +48,7 @@ public class AsyncTaskManager {
     有无线递归情况
      */
     private synchronized void scheduleNext() {
-        Log.d(TAG, "excute");
+        Log.d(TAG, "scheduleNext");
         try {
             //拿到一个任务
             mActive = taskSetQueue.takeLast();

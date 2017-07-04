@@ -18,24 +18,26 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void executeTasks() {
                 for (AsyncTask<?,?,?> task:getTaskList()){
-                    task.executeOnExecutor(AsyncTaskManager.executor);
+                    ((AsyncTask<String,Integer,String>)(task)).executeOnExecutor(AsyncTaskManager.executor,"task1");
                 }
             }
         };
         AsyncTaskSet taskSet2 = new AsyncTaskSet() {
             @Override
             public void executeTasks() {
-                for (int i=0;i<getTaskList().size();i++){
-                    if(i==8||i==9){
-                        ( (AsyncTask<Integer,Integer,Integer>)(getTaskList().get(i))).executeOnExecutor(AsyncTaskManager.executor,0);
-                    }else {
-                        getTaskList().get(i).executeOnExecutor(AsyncTaskManager.executor);
-                    }
-
+                for (AsyncTask<?,?,?> task:getTaskList()){
+                    ((AsyncTask<String,Integer,String>)(task)).executeOnExecutor(AsyncTaskManager.executor,"task2");
                 }
             }
         };
-        taskSet1.addTask(new MyTask1());
+        for(int i=0;i<100;i++){
+            taskSet1.addTask(new MyTask());
+        }
+
+        for (int i=0;i<100;i++){
+            taskSet2.addTask(new MyTask());
+        }
+        /*taskSet1.addTask(new MyTask1());
         taskSet1.addTask(new MyTask1());
         taskSet1.addTask(new MyTask1());
         taskSet1.addTask(new MyTask1());
@@ -48,9 +50,7 @@ public class MainActivity extends AppCompatActivity {
         taskSet2.addTask(new MyTask2());
         taskSet2.addTask(new MyTask2());
         taskSet2.addTask(new MyTask2());
-        taskSet2.addTask(new MyTask2());
-        taskSet2.addTask(new MyTask3());
-        taskSet2.addTask(new MyTask3());
+        taskSet2.addTask(new MyTask2());*/
         asyncTaskManager.execute(taskSet1);
         asyncTaskManager.execute(taskSet2);
         //new MyTask3().execute();
@@ -58,60 +58,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private class MyTask1 extends AsyncTask {
 
+
+    private class MyTask extends AsyncTask<String,Integer,String>{
 
         @Override
-        protected Object doInBackground(Object[] params) {
-            Log.d("MyTask1", "task1 doing in background");
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        protected String doInBackground(String... params) {
+            if (params!=null) {
+                Log.d("AsyncTask",  params[0] + "__doing in background");
+                return params[0];
+            }else {
+                return "null";
             }
-            return null;
         }
 
         @Override
-        protected void onPostExecute(Object o) {
-            super.onPostExecute(o);
-            Log.d("MyTask", "task1 finished");
-        }
-    }
-
-    private class MyTask2 extends AsyncTask {
-
-
-        @Override
-        protected Void doInBackground(Object[] params) {
-            Log.d("MyTask2", "task2 doing in background");
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-
-        @Override
-        protected void onPostExecute(Object o) {
-            super.onPostExecute(o);
-            Log.d("MyTask2", "task2 finished");
-        }
-    }
-
-    private class MyTask3 extends AsyncTask<Integer,Integer,Integer>{
-
-        @Override
-        protected Integer doInBackground(Integer... params) {
-            Log.d("MyTask3","task3 doing in background");
-            return 0;
-        }
-
-        @Override
-        protected void onPostExecute(Integer integer) {
+        protected void onPostExecute(String integer) {
             super.onPostExecute(integer);
+            Log.d("AsyncTask", "task" + integer + "__finished");
         }
     }
 }
