@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
  */
 
 public class AsyncTaskManager {
-    private static final String TAG = "AsncTaskManger";
+    private static final String TAG = "AsyncTaskManger";
     private BlockingDeque<AsyncTaskSet> taskSetQueue = new LinkedBlockingDeque<>();
     private AsyncTaskSet mActive;//当前执行任务
     public static final MyExecutor executor;
@@ -56,8 +56,10 @@ public class AsyncTaskManager {
             CountDownLatch latch = new CountDownLatch(mActive.getSize());
             executor.setLatch(latch);
             //遍历任务，开始执行
-            mActive.executeTasks();
-
+            List<ParallelSerialTask<?, ?, ?>> taskList = mActive.getTaskList();
+            for (ParallelSerialTask task : taskList){
+                task.execute();
+            }
             //阻塞当前线程
             latch.await();
             scheduleNext();
@@ -83,6 +85,7 @@ public class AsyncTaskManager {
                     try {
                         command.run();
                     } finally {
+                        Log.d(TAG,"countdown");
                         mLatch.countDown();
                     }
                 }
