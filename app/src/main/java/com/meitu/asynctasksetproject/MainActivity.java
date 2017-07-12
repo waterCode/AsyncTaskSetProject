@@ -13,7 +13,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        AsyncTaskManager asyncTaskManager = new AsyncTaskManager();
         AsyncTaskSet taskSet1 = new AsyncTaskSet();
         AsyncTaskSet taskSet2 = new AsyncTaskSet() ;
         for(int i=0;i<10;i++){
@@ -23,9 +22,8 @@ public class MainActivity extends AppCompatActivity {
         for (int i=0;i<100;i++){
             taskSet2.addTask(new MyTask("task2"));
         }
-
-        asyncTaskManager.execute(taskSet1);
-        asyncTaskManager.execute(taskSet2);
+        taskSet1.start();
+        taskSet2.start();
 
     }
 

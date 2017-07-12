@@ -10,10 +10,13 @@ import java.util.List;
  */
 
 public   class AsyncTaskSet {
+    public static  AsyncTaskManager mAsyncTaskManager =new AsyncTaskManager();
+
     private List<ParallelSerialTask<?,?,?>> taskList;
 
     public AsyncTaskSet() {
         this.taskList = new ArrayList<>();
+
     }
 
     public void addTask(ParallelSerialTask<?,?,?> task){
@@ -26,6 +29,10 @@ public   class AsyncTaskSet {
 
     public int getSize(){
         return taskList.size();
+    }
+
+    public void start(){
+        mAsyncTaskManager.execute(this);
     }
 
 
