@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         asyncTaskManager.execute(taskSet1);
-        asyncTaskManager.execute(taskSet2);
+        asyncTaskManager.execute(taskSet2);*/
 
     }
 
