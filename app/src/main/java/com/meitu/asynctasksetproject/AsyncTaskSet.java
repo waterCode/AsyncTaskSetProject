@@ -14,6 +14,7 @@ public   class AsyncTaskSet {
 
     private List<ParallelSerialTask<?,?,?>> taskList;
 
+
     public AsyncTaskSet() {
         this.taskList = new ArrayList<>();
 
@@ -34,6 +35,8 @@ public   class AsyncTaskSet {
     public void start(){
         mAsyncTaskManager.execute(this);
     }
+
+
 
 
   /*  *//*
