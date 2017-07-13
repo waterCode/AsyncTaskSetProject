@@ -12,6 +12,7 @@ import java.util.List;
 public   class AsyncTaskSet {
     private List<ParallelSerialTask<?,?,?>> taskList;
 
+
     public AsyncTaskSet() {
         this.taskList = new ArrayList<>();
     }
@@ -27,6 +28,8 @@ public   class AsyncTaskSet {
     public int getSize(){
         return taskList.size();
     }
+
+
 
 
   /*  *//*
