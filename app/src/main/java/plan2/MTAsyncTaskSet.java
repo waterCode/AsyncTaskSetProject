@@ -1,6 +1,5 @@
 package plan2;
 
-import android.animation.AnimatorSet;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -83,20 +82,22 @@ public class MTAsyncTaskSet implements MTAsyncTaskListener {
     }
 
     private void start(Node node) {
-        node.mAsyncTask.setAsyncTaskListener(this);
-        node.mAsyncTask.start();//执行任务
+        if (node != null && node.mAsyncTask != null) {
+            node.mAsyncTask.setAsyncTaskListener(this);
+            node.mAsyncTask.start();//执行任务
+        }
     }
 
     public void onChildrenTaskEnd(MTAsyncTask<?, ?, ?> task) {
         Node node = mTaskMap.get(task);
         ArrayList<Node> childrenList = node.mTaskChildrenList;
-        if (childrenList == null){
+        if (childrenList == null) {
             return;
         }
         for (Node children : childrenList) {
             children.mParentFinished++;
             if (!children.isTaskFinished) {//表示没有完成的节点,为了防止混乱，闭环
-                if ( children.mParentFinished >= children.mTaskParentList.size()) {//表示父类任务完成，可以开始自己的任务
+                if (children.mParentFinished >= children.mTaskParentList.size()) {//表示父类任务完成，可以开始自己的任务
                     start(children);
                 }
             }
@@ -120,7 +121,7 @@ public class MTAsyncTaskSet implements MTAsyncTaskListener {
             mCurrentNode = mTaskMap.get(task);
             if (mCurrentNode == null) {//if don't exist
                 mCurrentNode = new Node(task);
-                mTaskMap.put(task,mCurrentNode);//add to map
+                mTaskMap.put(task, mCurrentNode);//add to map
                 mNodeList.add(mCurrentNode);
             }
         }
@@ -208,13 +209,13 @@ public class MTAsyncTaskSet implements MTAsyncTaskListener {
         }
 
         public void addParents(ArrayList<Node> parents) {
-            if(parents == null){
+            if (parents == null) {
                 return;
             }
-            if(mTaskParentList == null){
+            if (mTaskParentList == null) {
                 mTaskParentList = new ArrayList<>();
             }
-            for (int i=0;i<parents.size();i++){//一部换为多小步
+            for (int i = 0; i < parents.size(); i++) {//一部换为多小步
                 addParent(parents.get(i));
             }
         }

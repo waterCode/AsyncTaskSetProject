@@ -1,53 +1,55 @@
 package com.meitu.asynctasksetproject;
 
-import android.content.Intent;
-import android.os.AsyncTask;
-import android.speech.tts.Voice;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import plan2.*;
+import plan2.MTAsyncTask;
 import plan2.MTAsyncTaskSet;
 
 public class MainActivity extends AppCompatActivity {
+
+    MyTask AA = new MyTask("AA");
+    MyTask Awith1 = new MyTask("Awith1");
+    MyTask Awith2 = new MyTask("Awith2");
+    MyTask BB = new MyTask("BB");
+    MyTask CC = new MyTask("CC");
+    plan2.MTAsyncTaskSet taskSet = new MTAsyncTaskSet();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        plan2.MTAsyncTaskSet taskSet= new MTAsyncTaskSet();
-        MyTask AA = new MyTask("AA");
-        MyTask Awith1= new MyTask("Awith1");
-        MyTask Awith2 = new MyTask("Awith2");
-        MyTask BB = new MyTask("BB");
-        MyTask CC = new MyTask("CC");
-
-
-        taskSet.run(AA).before(BB).after(CC).with(Awith1).with(Awith2);
 
         //进行AWith1限制
-        taskSet.run(Awith1).before(BB);
+        test4();
         taskSet.start();
+    }
 
-        /*AsyncTaskManager asyncTaskManager = new AsyncTaskManager();
-        AsyncTaskSet taskSet1 = new AsyncTaskSet();
-        AsyncTaskSet taskSet2 = new AsyncTaskSet() ;
-        for(int i=0;i<10;i++){
-            taskSet1.addTask(new MyTask("task1"));
-        }
+    void test1() {
+        taskSet.run(AA).before(BB).after(CC).with(Awith1).with(Awith2);
+    }
 
-        for (int i=0;i<100;i++){
-            taskSet2.addTask(new MyTask("task2"));
-        }
+    void test2(){//先执行C，然后AA，AWith1，Awith2并行，都执行完后执行B
+        test1();
+        taskSet.run(Awith1).before(BB);
+        taskSet.run(Awith2).before(BB);
+    }
 
-        asyncTaskManager.execute(taskSet1);
-        asyncTaskManager.execute(taskSet2);*/
+    void test3(){
+        test2();
+        taskSet.run(Awith1).after(BB);//逻辑错误，和test相反，出现相距依赖，闭环问题，造成只能执行c
+    }
+
+    void test4(){
+        taskSet.run(null);
+        taskSet.run(Awith1).after(null);
 
     }
 
-    class MyTask extends MTAsyncTask<String,String,String>{
+
+    class MyTask extends MTAsyncTask<String, String, String> {
 
         public MyTask(String... params) {
             super(params);
@@ -55,14 +57,12 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... params) {
-            if(params!=null&&params.length>=1) {
-                Log.d("taskName", ""+params[0]);
+            if (params != null && params.length >= 1) {
+                Log.d("任务在运行中", "" + params[0]);
             }
             return "";
         }
     }
-
-
 
 
 }

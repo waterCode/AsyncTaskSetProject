@@ -13,6 +13,7 @@ public abstract class MTAsyncTask<Params,Progress,Result> extends AsyncTask<Para
     private static final String TAG="MTAsyncTask";
     private Params[] mParamses;
     private Executor mMtExcutor;
+    MTAsyncTaskListener mListener;
 
     {
         mMtExcutor = new MTExecutor();
@@ -21,7 +22,6 @@ public abstract class MTAsyncTask<Params,Progress,Result> extends AsyncTask<Para
         this.mListener = mListener;
     }
 
-    MTAsyncTaskListener mListener;
 
     public MTAsyncTask(Params... params) {
         mParamses = params;
