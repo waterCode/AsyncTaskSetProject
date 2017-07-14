@@ -21,6 +21,8 @@ public class MTAsyncTaskSet implements MTAsyncTaskListener {
     public MTAsyncTaskSet() {
         mTaskMap = new HashMap<>();
         mTaskMap.put(mStartTask, mStartNode);//init
+        mStartTask.setAsyncTaskListener(this);
+
     }
 
     public Builder run(MTAsyncTask<?, ?, ?> task) {
@@ -77,7 +79,7 @@ public class MTAsyncTaskSet implements MTAsyncTaskListener {
 
     public void start() {
         createDependencyGraph();
-        onChildrenTaskEnd(mStartTask);
+        start(mStartNode);
     }
 
     private void start(Node node) {
@@ -87,14 +89,15 @@ public class MTAsyncTaskSet implements MTAsyncTaskListener {
 
     public void onChildrenTaskEnd(MTAsyncTask<?, ?, ?> task) {
         Node node = mTaskMap.get(task);
-        ArrayList<Node> chidrenList = node.mTaskChildrenList;
-        if (chidrenList == null){
+        ArrayList<Node> childrenList = node.mTaskChildrenList;
+        if (childrenList == null){
             return;
         }
-        for (Node chidren : chidrenList) {
-            if (!chidren.isTaskFinished) {//表示没有完成的节点
-                if (node.mTaskParentList == null || node.mParentFinished >= node.mTaskParentList.size()) {//表示父类任务完成，可以开始自己的任务
-                    start(chidren);
+        for (Node children : childrenList) {
+            children.mParentFinished++;
+            if (!children.isTaskFinished) {//表示没有完成的节点,为了防止混乱，闭环
+                if ( children.mParentFinished >= children.mTaskParentList.size()) {//表示父类任务完成，可以开始自己的任务
+                    start(children);
                 }
             }
         }
@@ -104,7 +107,7 @@ public class MTAsyncTaskSet implements MTAsyncTaskListener {
     @Override
     public void onAsyncTaskFinish(MTAsyncTask<?, ?, ?> task) {
         Node node = mTaskMap.get(task);
-        node.mParentFinished++;
+        //node.mParentFinished++;
         node.isTaskFinished = true;
         onChildrenTaskEnd(task);
     }

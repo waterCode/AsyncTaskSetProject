@@ -2,6 +2,7 @@ package plan2;
 
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.util.concurrent.Executor;
 
@@ -9,6 +10,7 @@ import java.util.concurrent.Executor;
  * Created by zmc on 2017/7/14.
  */
 public abstract class MTAsyncTask<Params,Progress,Result> extends AsyncTask<Params,Progress,Result> {
+    private static final String TAG="MTAsyncTask";
     private Params[] mParamses;
     private Executor mMtExcutor;
 
@@ -26,6 +28,9 @@ public abstract class MTAsyncTask<Params,Progress,Result> extends AsyncTask<Para
     }
 
     public void start(){
+        if(mParamses!=null&&mParamses.length>=1) {
+            Log.d(TAG, "开始运行" + mParamses[0]);
+        }
         executeOnExecutor(mMtExcutor,mParamses);//
     }
 
