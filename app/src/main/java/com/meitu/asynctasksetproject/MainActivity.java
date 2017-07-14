@@ -7,25 +7,29 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import plan2.*;
+import plan2.MTAsyncTaskSet;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        MyTask task_A = new MyTask("taskAAAA");
-        MyTask task_A1 = new MyTask("taskAAAA111");
-        MyTask task_B = new MyTask("taskBBBB");
-        MyTask task_B1 = new MyTask("taskBBB11");
-        MyTask task_B2 = new MyTask("taskBBBB222");
-        MyTask task_B3 = new MyTask("taskBBBB333");
-        MyTask task_C = new MyTask("taskCCCC");
-        MyTask task_D = new MyTask("taskDDDD");
-        MTAsyncTaskSet mtAsyncTaskSet = new MTAsyncTaskSet();
-        mtAsyncTaskSet.run(task_B).with(task_C).with(task_B1).with(task_B2).with(task_B3).after(task_A).before(task_D);
-        mtAsyncTaskSet.run(task_B).after(task_A1);
-        mtAsyncTaskSet.start();
 
+        plan2.MTAsyncTaskSet taskSet= new MTAsyncTaskSet();
+        MyTask AA = new MyTask("AA");
+        MyTask Awith1= new MyTask("Awith1");
+        MyTask Awith2 = new MyTask("Awith2");
+        MyTask BB = new MyTask("BB");
+        MyTask CC = new MyTask("CC");
+
+
+        taskSet.run(AA).before(BB).after(CC).with(Awith1).with(Awith2);
+
+        //进行AWith1限制
+        taskSet.run(Awith1).before(BB);
+        taskSet.start();
 
         /*AsyncTaskManager asyncTaskManager = new AsyncTaskManager();
         AsyncTaskSet taskSet1 = new AsyncTaskSet();
@@ -43,11 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-
-
-    private class MyTask extends ParallelSerialTask<String,Integer,String>{
-
+    class MyTask extends MTAsyncTask<String,String,String>{
 
         public MyTask(String... params) {
             super(params);
@@ -55,21 +55,16 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... params) {
-            if (params!=null) {
-                Log.d("AsyncTask",  params[0] + "__doing in background");
-                Log.d("AsyncTask",  params[0] + "__finished");
-                return params[0];
-            }else {
-                return "null";
+            if(params!=null&&params.length>=1) {
+                Log.d("taskName", ""+params[0]);
             }
-        }
-
-        @Override
-        protected void onPostExecute(String integer) {
-            super.onPostExecute(integer);
-
+            return "";
         }
     }
+
+
+
+
 }
 
 
