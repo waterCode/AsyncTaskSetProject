@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         //进行AWith1限制
-        test6();
+        test7();
     }
 
     void test1() {
@@ -59,6 +59,17 @@ public class MainActivity extends AppCompatActivity {
         taskSet1.run(AA).before(BB);
         taskSet2.run(CC);
         taskSet.run(taskSet2).before(taskSet1);
+        taskSet.start();
+    }
+
+
+    /**
+     * 多层嵌套
+     */
+    public void test7(){
+        taskSet1.run(AA);
+        taskSet2.run(taskSet1).after(BB);
+        taskSet.run(taskSet2).before(CC);
         taskSet.start();
     }
 
