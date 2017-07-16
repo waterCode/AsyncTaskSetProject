@@ -1,5 +1,6 @@
 package plan2;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -14,6 +15,7 @@ public abstract class MTAsyncTask<Params,Progress,Result> extends AsyncTask<Para
     private Params[] mParamses;
     private Executor mMtExcutor;
     private MTAsyncTaskListener mListener;
+    private static Intent taskIntent = new Intent();
 
     {
         mMtExcutor = new MTExecutor();
@@ -22,6 +24,10 @@ public abstract class MTAsyncTask<Params,Progress,Result> extends AsyncTask<Para
         this.mListener = mListener;
     }
 
+
+    public Intent getTaskIntent(){
+        return taskIntent;
+    }
 
     public MTAsyncTask(Params... params) {
         mParamses = params;

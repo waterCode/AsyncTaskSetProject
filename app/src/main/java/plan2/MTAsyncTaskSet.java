@@ -1,5 +1,7 @@
 package plan2;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -12,6 +14,7 @@ import java.util.Map;
  */
 public class MTAsyncTaskSet<Params,Progress,Result>  extends MTAsyncTask<Params,Progress,Result> implements MTAsyncTaskListener {
 
+    private static final String TAG = "MTAsyncTaskSet";
     private MTAsyncTask<?, ?, ?> mStartTask = new TestTask("StartTask");
     private Node mStartNode = new Node(mStartTask);
     private Map<MTAsyncTask<?, ?, ?>, Node> mTaskMap;
@@ -32,7 +35,7 @@ public class MTAsyncTaskSet<Params,Progress,Result>  extends MTAsyncTask<Params,
     @Override
     protected Result doInBackground(Params... params) {
         start();
-        Log.d("dsfdsf","dsf");
+        Log.d(TAG,"doInBackground");
         return null;
     }
 

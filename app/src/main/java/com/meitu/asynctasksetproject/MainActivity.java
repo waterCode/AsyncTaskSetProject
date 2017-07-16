@@ -1,5 +1,6 @@
 package com.meitu.asynctasksetproject;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -14,6 +15,8 @@ public class MainActivity extends AppCompatActivity {
     MyTask Awith2 = new MyTask("Awith2");
     MyTask BB = new MyTask("BB");
     MyTask CC = new MyTask("CC");
+    MyTask1 PP = new MyTask1("PP");//用于接受参数设置
+
     plan2.MTAsyncTaskSet<String,String,String> taskSet1 = new MTAsyncTaskSet<>("tarkSet1");
     plan2.MTAsyncTaskSet<String,String,String> taskSet2 = new MTAsyncTaskSet<>("taskSet2");
     plan2.MTAsyncTaskSet<String,String,String> taskSet = new MTAsyncTaskSet<>("taskSet");
@@ -25,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         //进行AWith1限制
-        test5();
+        test6();
     }
 
     void test1() {
@@ -49,12 +52,26 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * 嵌套测试
+     */
     public void test5(){
         taskSet1.run(AA).before(BB);
         taskSet2.run(CC);
         taskSet.run(taskSet2).before(taskSet1);
         taskSet.start();
     }
+
+    /**
+     * 参数传递测试
+     */
+
+    public void test6(){
+        taskSet1.run(AA).before(PP);
+        taskSet1.start();
+    }
+
+
 
 
 
@@ -66,6 +83,26 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... params) {
+            if (params != null && params.length >= 1) {
+                Log.d("任务在运行中", "" + params[0]);
+            }
+            Intent intent = getTaskIntent();
+            intent.putExtra("MyTask","参数");
+            return "";
+        }
+    }
+
+    class MyTask1 extends MTAsyncTask<String, String, String> {
+
+        public MyTask1(String... params) {
+            super(params);
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            Intent intent = getTaskIntent();
+            Log.d("MyTask1","接受参数为" + intent.getStringExtra("MyTask"));
+
             if (params != null && params.length >= 1) {
                 Log.d("任务在运行中", "" + params[0]);
             }
