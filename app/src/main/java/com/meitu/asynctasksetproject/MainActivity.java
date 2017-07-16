@@ -14,7 +14,9 @@ public class MainActivity extends AppCompatActivity {
     MyTask Awith2 = new MyTask("Awith2");
     MyTask BB = new MyTask("BB");
     MyTask CC = new MyTask("CC");
-    plan2.MTAsyncTaskSet taskSet = new MTAsyncTaskSet();
+    plan2.MTAsyncTaskSet<String,String,String> taskSet1 = new MTAsyncTaskSet<>("tarkSet1");
+    plan2.MTAsyncTaskSet<String,String,String> taskSet2 = new MTAsyncTaskSet<>("taskSet2");
+    plan2.MTAsyncTaskSet<String,String,String> taskSet = new MTAsyncTaskSet<>("taskSet");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,30 +25,37 @@ public class MainActivity extends AppCompatActivity {
 
 
         //进行AWith1限制
-        test4();
-        taskSet.start();
+        test5();
     }
 
     void test1() {
-        taskSet.run(AA).before(BB).after(CC).with(Awith1).with(Awith2);
+        taskSet1.run(AA).before(BB).after(CC).with(Awith1).with(Awith2);
     }
 
     void test2(){//先执行C，然后AA，AWith1，Awith2并行，都执行完后执行B
         test1();
-        taskSet.run(Awith1).before(BB);
-        taskSet.run(Awith2).before(BB);
+        taskSet1.run(Awith1).before(BB);
+        taskSet1.run(Awith2).before(BB);
     }
 
     void test3(){
         test2();
-        taskSet.run(Awith1).after(BB);//逻辑错误，和test相反，出现相距依赖，闭环问题，造成只能执行c
+        taskSet1.run(Awith1).after(BB);//逻辑错误，和test相反，出现相距依赖，闭环问题，造成只能执行c
     }
 
     void test4(){
-        taskSet.run(null);
-        taskSet.run(Awith1).after(null);
+        taskSet1.run(null);
+        taskSet1.run(Awith1).after(null);
 
     }
+
+    public void test5(){
+        taskSet1.run(AA).before(BB);
+        taskSet2.run(CC);
+        taskSet.run(taskSet2).before(taskSet1);
+        taskSet.start();
+    }
+
 
 
     class MyTask extends MTAsyncTask<String, String, String> {

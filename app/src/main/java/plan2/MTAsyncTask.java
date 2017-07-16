@@ -13,7 +13,7 @@ public abstract class MTAsyncTask<Params,Progress,Result> extends AsyncTask<Para
     private static final String TAG="MTAsyncTask";
     private Params[] mParamses;
     private Executor mMtExcutor;
-    MTAsyncTaskListener mListener;
+    private MTAsyncTaskListener mListener;
 
     {
         mMtExcutor = new MTExecutor();
@@ -27,7 +27,7 @@ public abstract class MTAsyncTask<Params,Progress,Result> extends AsyncTask<Para
         mParamses = params;
     }
 
-    public void start(){
+    public void startTask(){
         if(mParamses!=null&&mParamses.length>=1) {
             Log.d(TAG, "开始运行" + mParamses[0]);
         }

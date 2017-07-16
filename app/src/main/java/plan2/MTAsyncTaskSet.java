@@ -1,6 +1,7 @@
 package plan2;
 
 import android.util.Log;
+import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,7 +10,7 @@ import java.util.Map;
 /**
  * Created by zmc on 2017/7/14.
  */
-public class MTAsyncTaskSet implements MTAsyncTaskListener {
+public class MTAsyncTaskSet<Params,Progress,Result>  extends MTAsyncTask<Params,Progress,Result> implements MTAsyncTaskListener {
 
     private MTAsyncTask<?, ?, ?> mStartTask = new TestTask("StartTask");
     private Node mStartNode = new Node(mStartTask);
@@ -17,11 +18,22 @@ public class MTAsyncTaskSet implements MTAsyncTaskListener {
     private ArrayList<Node> mNodeList = new ArrayList<>();
     private boolean isCreateDependencyGraph = false;//用来判断是否建立依赖图，第一次开始的时候建立一次就好
 
-    public MTAsyncTaskSet() {
+
+    public MTAsyncTaskSet(Params... paramses) {
+        super(paramses);
         mTaskMap = new HashMap<>();
         mTaskMap.put(mStartTask, mStartNode);//init
         mStartTask.setAsyncTaskListener(this);
+    }
 
+
+
+
+    @Override
+    protected Result doInBackground(Params... params) {
+        start();
+        Log.d("dsfdsf","dsf");
+        return null;
     }
 
     public Builder run(MTAsyncTask<?, ?, ?> task) {
@@ -76,6 +88,7 @@ public class MTAsyncTaskSet implements MTAsyncTaskListener {
         }
     }
 
+
     public void start() {
         createDependencyGraph();
         start(mStartNode);
@@ -84,7 +97,7 @@ public class MTAsyncTaskSet implements MTAsyncTaskListener {
     private void start(Node node) {
         if (node != null && node.mAsyncTask != null) {
             node.mAsyncTask.setAsyncTaskListener(this);
-            node.mAsyncTask.start();//执行任务
+            node.mAsyncTask.startTask();//执行任务
         }
     }
 
@@ -171,7 +184,6 @@ public class MTAsyncTaskSet implements MTAsyncTaskListener {
         }
 
         private MTAsyncTask<?, ?, ?> mAsyncTask;
-        private ArrayList<Node> mTaskNodeList = new ArrayList<>();
         private ArrayList<Node> mTaskChildrenList;
         private ArrayList<Node> mTaskParentList;
         private ArrayList<Node> mTaskSibingList;
