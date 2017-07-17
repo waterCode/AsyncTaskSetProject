@@ -1,18 +1,17 @@
 package plan2;
 
-import android.app.Activity;
-import android.content.Intent;
+import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by zmc on 2017/7/14.
  */
-public class MTAsyncTaskSet<Params,Progress,Result>  extends MTAsyncTask<Params,Progress,Result> implements MTAsyncTaskListener {
+public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params, Progress, Result> implements MTAsyncTaskListener {
 
     private static final String TAG = "MTAsyncTaskSet";
     private MTAsyncTask<?, ?, ?> mStartTask = new TestTask("StartTask");
@@ -30,12 +29,10 @@ public class MTAsyncTaskSet<Params,Progress,Result>  extends MTAsyncTask<Params,
     }
 
 
-
-
     @Override
     protected Result doInBackground(Params... params) {
         start();
-        Log.d(TAG,"doInBackground");
+        Log.d(TAG, "doInBackground");
         return null;
     }
 
@@ -99,9 +96,37 @@ public class MTAsyncTaskSet<Params,Progress,Result>  extends MTAsyncTask<Params,
 
     private void start(Node node) {
         if (node != null && node.mAsyncTask != null) {
+            //找到所有的所需结果参数
+            ArrayList<Object> objectParams = getStartParams(node.mFromResult);//交给执行部分去检查
             node.mAsyncTask.setAsyncTaskListener(this);
-            node.mAsyncTask.startTask();//执行任务
+            if (node.mResultMap != null) {
+                node.mResultMap.map(objectParams.toArray());
+                node.mAsyncTask.startTask(node.mResultMap.map(objectParams.toArray()));//执行任务
+            } else {
+
+                node.mAsyncTask.startTask(null);//执行任务
+            }
+
+
         }
+    }
+
+    private ArrayList<Object> getStartParams(ArrayList<AsyncTask<?, ?, ?>> fromResult) {
+        ArrayList<Object> taskList = null;
+        if (fromResult != null) {
+            taskList = new ArrayList<>();
+            for (AsyncTask<?, ?, ?> task : fromResult) {
+                try {
+                    taskList.add(task.get());//把所有参数添加到数组
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }
+        return taskList;
     }
 
     public void onChildrenTaskEnd(MTAsyncTask<?, ?, ?> task) {
@@ -142,6 +167,28 @@ public class MTAsyncTaskSet<Params,Progress,Result>  extends MTAsyncTask<Params,
             }
         }
 
+        public Builder from(MTAsyncTask<?, ?, ?>... task) {
+            if (task != null) {
+                for (MTAsyncTask<?, ?, ?> tempTask : task) {
+                    Node node = mTaskMap.get(tempTask);
+                    if (node == null) {//节点不存在则添加节点
+                        node = new Node(tempTask);
+                        mTaskMap.put(tempTask, node);
+                        mNodeList.add(node);
+                    }
+                    mCurrentNode.addFromResult(tempTask);
+                }
+            }
+            return this;
+        }
+
+        public Builder map(ResultMap map) {
+            if (map != null) {
+                mCurrentNode.addResultMap(map);
+            }
+            return this;
+        }
+
         public Builder with(MTAsyncTask<?, ?, ?> task) {
             Node node = mTaskMap.get(task);
             if (node == null) {
@@ -180,18 +227,22 @@ public class MTAsyncTaskSet<Params,Progress,Result>  extends MTAsyncTask<Params,
 
     }
 
+
     private class Node {
+
 
         public Node(MTAsyncTask<?, ?, ?> mAsyncTask) {
             this.mAsyncTask = mAsyncTask;
         }
 
+        private ResultMap mResultMap;//映射转换接口
         private MTAsyncTask<?, ?, ?> mAsyncTask;
         private ArrayList<Node> mTaskChildrenList;
         private ArrayList<Node> mTaskParentList;
         private ArrayList<Node> mTaskSibingList;
         private boolean isTaskFinished = false;
         private int mParentFinished = 0;
+        private ArrayList<AsyncTask<?, ?, ?>> mFromResult;
 
         public void addParent(Node node) {
             if (mTaskParentList == null) {
@@ -200,6 +251,23 @@ public class MTAsyncTaskSet<Params,Progress,Result>  extends MTAsyncTask<Params,
             if (!mTaskParentList.contains(node)) {
                 mTaskParentList.add(node);
                 node.addChildren(this);
+            }
+        }
+
+        public void addFromResult(AsyncTask<?, ?, ?> task) {
+            if (mFromResult == null) {
+                mFromResult = new ArrayList<>();
+            }
+            if (!mFromResult.contains(task)) {//如果重复添加则跳过
+                mFromResult.add(task);
+            }
+        }
+
+        public void addFromResults(AsyncTask<?, ?, ?>[] tasks) {
+            if (tasks != null) {
+                for (AsyncTask<?, ?, ?> tempTask : tasks) {
+                    addFromResult(tempTask);
+                }
             }
         }
 
@@ -236,6 +304,11 @@ public class MTAsyncTaskSet<Params,Progress,Result>  extends MTAsyncTask<Params,
         }
 
 
+        public void addResultMap(ResultMap map) {
+            mResultMap = map;
+        }
+
+
     }
 }
 
@@ -264,7 +337,7 @@ class TestTask extends MTAsyncTask<String, String, String> {
     @Override
     protected String doInBackground(String[] params) {
         if (params != null && params.length > 0) {
-            Log.d("mttask", "" + params[0]);
+            Log.d("startTask", "" + params[0]);
         }
         return null;
     }

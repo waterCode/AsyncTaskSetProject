@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.concurrent.Executor;
 
 /**
@@ -15,7 +16,7 @@ public abstract class MTAsyncTask<Params,Progress,Result> extends AsyncTask<Para
     private Params[] mParamses;
     private Executor mMtExcutor;
     private MTAsyncTaskListener mListener;
-    private static Intent taskIntent = new Intent();
+
 
     {
         mMtExcutor = new MTExecutor();
@@ -25,20 +26,26 @@ public abstract class MTAsyncTask<Params,Progress,Result> extends AsyncTask<Para
     }
 
 
-    public Intent getTaskIntent(){
-        return taskIntent;
-    }
 
     public MTAsyncTask(Params... params) {
         mParamses = params;
     }
 
-    public void startTask(){
+    /**
+     *
+     * @param resultParams 依赖任务的结果参数
+     */
+    public void startTask(Object[] resultParams){
         if(mParamses!=null&&mParamses.length>=1) {
             Log.d(TAG, "开始运行" + mParamses[0]);
         }
-        executeOnExecutor(mMtExcutor,mParamses);//
+        //处理结果参数
+        mParamses = (Params[]) resultParams;
+        // TODO: 2017/7/17 这里应该怎么判断参数类型 
+        executeOnExecutor(mMtExcutor,mParamses);//进行强制转换
     }
+
+
 
     private class MTExecutor implements Executor {
 

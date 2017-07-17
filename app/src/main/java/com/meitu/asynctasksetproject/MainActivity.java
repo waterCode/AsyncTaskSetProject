@@ -1,25 +1,27 @@
 package com.meitu.asynctasksetproject;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import plan2.MTAsyncTask;
 import plan2.MTAsyncTaskSet;
+import plan2.ResultMap;
 
 public class MainActivity extends AppCompatActivity {
 
-    MyTask AA = new MyTask("AA");
-    MyTask Awith1 = new MyTask("Awith1");
-    MyTask Awith2 = new MyTask("Awith2");
-    MyTask BB = new MyTask("BB");
-    MyTask CC = new MyTask("CC");
-    MyTask1 PP = new MyTask1("PP");//用于接受参数设置
+    TaskAA AA = new TaskAA("AA");//网络
 
-    plan2.MTAsyncTaskSet<String,String,String> taskSet1 = new MTAsyncTaskSet<>("tarkSet1");
-    plan2.MTAsyncTaskSet<String,String,String> taskSet2 = new MTAsyncTaskSet<>("taskSet2");
-    plan2.MTAsyncTaskSet<String,String,String> taskSet = new MTAsyncTaskSet<>("taskSet");
+    TaskAA Awith1 = new TaskAA("Awith1");
+    TaskAA Awith2 = new TaskAA("Awith2");
+    TaskBB BB = new TaskBB("BB");
+    TaskCC CC = new TaskCC("CC");
+    TaskBB PP = new TaskBB("PP");//用于接受参数设置
+    TaskEE EE = new TaskEE("EE");
+
+    plan2.MTAsyncTaskSet<String, String, String> taskSet1 = new MTAsyncTaskSet<>("taskSet1");
+    plan2.MTAsyncTaskSet<String, String, String> taskSet2 = new MTAsyncTaskSet<>("taskSet2");
+    plan2.MTAsyncTaskSet<String, String, String> taskSet = new MTAsyncTaskSet<>("taskSet");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,25 +30,25 @@ public class MainActivity extends AppCompatActivity {
 
 
         //进行AWith1限制
-        test7();
+        test8();
     }
 
     void test1() {
         taskSet1.run(AA).before(BB).after(CC).with(Awith1).with(Awith2);
     }
 
-    void test2(){//先执行C，然后AA，AWith1，Awith2并行，都执行完后执行B
+    void test2() {//先执行C，然后AA，AWith1，Awith2并行，都执行完后执行B
         test1();
         taskSet1.run(Awith1).before(BB);
         taskSet1.run(Awith2).before(BB);
     }
 
-    void test3(){
+    void test3() {
         test2();
         taskSet1.run(Awith1).after(BB);//逻辑错误，和test相反，出现相距依赖，闭环问题，造成只能执行c
     }
 
-    void test4(){
+    void test4() {
         taskSet1.run(null);
         taskSet1.run(Awith1).after(null);
 
@@ -55,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 嵌套测试
      */
-    public void test5(){
+    public void test5() {
         taskSet1.run(AA).before(BB);
         taskSet2.run(CC);
         taskSet.run(taskSet2).before(taskSet1);
@@ -66,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 多层嵌套
      */
-    public void test7(){
+    public void test7() {
         taskSet1.run(AA);
         taskSet2.run(taskSet1).after(BB);
         taskSet.run(taskSet2).before(CC);
@@ -77,46 +79,114 @@ public class MainActivity extends AppCompatActivity {
      * 参数传递测试
      */
 
-    public void test6(){
+    public void test6() {
         taskSet1.run(AA).before(PP);
         taskSet1.start();
     }
 
 
+    /**
+     * 并行任务参数传递
+     */
+    public void test8() {
+        taskSet1.run(AA).with(BB).before(CC);
+        taskSet1.run(EE).after(CC).from(AA,BB,CC).map(new ResultMap<Object, String>() {
 
 
+            @Override
+            public String[] map(Object[] result) {
+                String[] s = new String[result.length];
+                for (int i = 0; i < result.length; i++) {
+                    s[i] = (String) result[i];
+                }
+                return s;
+            }
+        });
 
-    class MyTask extends MTAsyncTask<String, String, String> {
+        taskSet1.start();
+    }
 
-        public MyTask(String... params) {
+
+    class TaskAA extends MTAsyncTask<String, String, String> {
+
+        public TaskAA(String... params) {
             super(params);
         }
 
         @Override
         protected String doInBackground(String... params) {
-            if (params != null && params.length >= 1) {
-                Log.d("任务在运行中", "" + params[0]);
+            String s = "";
+            if (params != null) {
+                for (String temp : params) {
+                    s = s +" + "+ temp;
+                }
             }
-            Intent intent = getTaskIntent();
-            intent.putExtra("MyTask","参数");
-            return "";
+
+            Log.d("TaskAA", "获得其他任务结果作为执行参数有: " + s);
+
+
+            return "A的结果";
         }
     }
 
-    class MyTask1 extends MTAsyncTask<String, String, String> {
+    class TaskBB extends MTAsyncTask<String, String, String> {
 
-        public MyTask1(String... params) {
+        public TaskBB(String... params) {
             super(params);
         }
 
         @Override
         protected String doInBackground(String... params) {
-            Intent intent = getTaskIntent();
-            Log.d("MyTask1","接受参数为" + intent.getStringExtra("MyTask"));
 
-            if (params != null && params.length >= 1) {
-                Log.d("任务在运行中", "" + params[0]);
+            String s = "";
+            if (params != null) {
+                for (String temp : params) {
+                    s = s +" + "+ temp;
+                }
             }
+
+            Log.d("TaskAA", "获得其他任务结果作为执行参数有: " + s);
+            return "B的结果";
+        }
+    }
+
+    class TaskCC extends MTAsyncTask<String, String, String> {
+
+        public TaskCC(String... params) {
+            super(params);
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            String s = "";
+            if (params != null) {
+                for (String temp : params) {
+                    s = s +" + "+ temp;
+                }
+            }
+
+            Log.d("TaskAA", "获得其他任务结果作为执行参数有: " + s);
+            return "C任务的结果";
+        }
+    }
+
+    class TaskEE extends MTAsyncTask<String, String, String> {
+
+        public TaskEE(String... params) {
+            super(params);
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String s = "";
+            if (params != null) {
+                for (String temp : params) {
+                    s = s +" + "+ temp;
+                }
+            }
+
+            Log.d("TaskAA", "获得其他任务结果作为执行参数有: " + s);
             return "";
         }
     }
