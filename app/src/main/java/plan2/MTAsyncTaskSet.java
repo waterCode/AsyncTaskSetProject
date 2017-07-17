@@ -100,8 +100,12 @@ public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params
             ArrayList<Object> objectParams = getStartParams(node.mFromResult);//交给执行部分去检查
             node.mAsyncTask.setAsyncTaskListener(this);
             if (node.mResultMap != null) {
-                node.mResultMap.map(objectParams.toArray());
-                node.mAsyncTask.startTask(node.mResultMap.map(objectParams.toArray()));//执行任务
+                if(objectParams !=null) {
+                    node.mResultMap.map(objectParams.toArray());
+                    node.mAsyncTask.startTask(node.mResultMap.map(objectParams.toArray()));//执行任务
+                }else {
+                    Log.e("MTAsycTaskSet","没有设置依赖任务,需要调用from依赖任务");
+                }
             } else {
 
                 node.mAsyncTask.startTask(null);//执行任务
@@ -119,6 +123,7 @@ public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params
                 try {
                     taskList.add(task.get());//把所有参数添加到数组
                 } catch (InterruptedException e) {
+                    Log.e("MTAsynceTaskSet","所依赖任务还没完成");
                     e.printStackTrace();
                 } catch (ExecutionException e) {
                     e.printStackTrace();
