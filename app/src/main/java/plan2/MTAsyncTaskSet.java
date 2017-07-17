@@ -17,12 +17,12 @@ public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params
     private MTAsyncTask<?, ?, ?> mStartTask = new TestTask("StartTask");//最开始执行任务root节点
     private Node mStartNode = new Node(mStartTask);//root节点的包装node节点
     private Map<MTAsyncTask<?, ?, ?>, Node> mTaskMap;//AsyncTask 任务与节点的映射集合
-    private ArrayList<Node> mNodeList = new ArrayList<>();
+    private ArrayList<Node> mNodeList = new ArrayList<>();//所有节点的集合
     private boolean isCreateDependencyGraph = false;//用来判断是否建立依赖图，第一次开始的时候建立一次就好
 
 
-    public MTAsyncTaskSet(Params... paramses) {
-        super(paramses);
+    public MTAsyncTaskSet(String name) {
+        super(name);
         mTaskMap = new HashMap<>();
         mTaskMap.put(mStartTask, mStartNode);//init
         mStartTask.setAsyncTaskListener(this);
@@ -48,7 +48,7 @@ public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params
     /**
      * 创建依赖树，主要是讲兄弟的付清统一，让依赖调整为树状结构
      */
-    public void createDependencyGraph() {
+    private void createDependencyGraph() {
         if (!isCreateDependencyGraph) {
             //主要是解决sibing和起始点的问题
             int size = mNodeList.size();
@@ -364,8 +364,8 @@ public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params
 class TestTask extends MTAsyncTask<String, String, String> {
 
 
-    public TestTask(String... params) {
-        super(params);
+    public TestTask(String name) {
+        super(name);
     }
 
     /**
