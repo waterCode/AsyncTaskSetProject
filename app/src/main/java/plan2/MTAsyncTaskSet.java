@@ -14,9 +14,9 @@ import java.util.concurrent.ExecutionException;
 public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params, Progress, Result> implements MTAsyncTaskListener {
 
     private static final String TAG = "MTAsyncTaskSet";
-    private MTAsyncTask<?, ?, ?> mStartTask = new TestTask("StartTask");
-    private Node mStartNode = new Node(mStartTask);
-    private Map<MTAsyncTask<?, ?, ?>, Node> mTaskMap;
+    private MTAsyncTask<?, ?, ?> mStartTask = new TestTask("StartTask");//最开始执行任务root节点
+    private Node mStartNode = new Node(mStartTask);//root节点的包装node节点
+    private Map<MTAsyncTask<?, ?, ?>, Node> mTaskMap;//AsyncTask 任务与节点的映射集合
     private ArrayList<Node> mNodeList = new ArrayList<>();
     private boolean isCreateDependencyGraph = false;//用来判断是否建立依赖图，第一次开始的时候建立一次就好
 
@@ -45,6 +45,9 @@ public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params
     }
 
 
+    /**
+     * 创建依赖树，主要是讲兄弟的付清统一，让依赖调整为树状结构
+     */
     public void createDependencyGraph() {
         if (!isCreateDependencyGraph) {
             //主要是解决sibing和起始点的问题
@@ -76,6 +79,11 @@ public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params
         }
     }
 
+    /**
+     * 递归实现找出所有的兄弟，比如A和B是兄弟，B和C是兄弟，那么A和C也是兄弟
+     * @param node
+     * @param mTaskSibingList
+     */
     private void findAllSibings(Node node, ArrayList<Node> mTaskSibingList) {
         if (!mTaskSibingList.contains(node)) {//没有这个节点就会加入
             mTaskSibingList.add(node);
@@ -89,11 +97,18 @@ public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params
     }
 
 
+    /**
+     * 任务集合开始任务
+     */
     public void start() {
         createDependencyGraph();
         start(mStartNode);
     }
 
+    /**
+     * 开始执行这个节点所包含任务
+     * @param node 开始任务节点
+     */
     private void start(Node node) {
         if (node != null && node.mAsyncTask != null) {
             //找到所有的所需结果参数
@@ -115,6 +130,11 @@ public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params
         }
     }
 
+    /**
+     * 获得开始任务的所有执行参数
+     * @param fromResult 该任务所依赖的任务
+     * @return 任务参数集合
+     */
     private ArrayList<Object> getStartParams(ArrayList<AsyncTask<?, ?, ?>> fromResult) {
         ArrayList<Object> taskList = null;
         if (fromResult != null) {
@@ -134,6 +154,10 @@ public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params
         return taskList;
     }
 
+    /**
+     * 遍历孩子节点来决定是否开始孩子任务（根据父亲是否都执行完毕）
+     * @param task 刚刚完成的任务
+     */
     public void onChildrenTaskEnd(MTAsyncTask<?, ?, ?> task) {
         Node node = mTaskMap.get(task);
         ArrayList<Node> childrenList = node.mTaskChildrenList;
@@ -151,6 +175,10 @@ public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params
 
     }
 
+    /**
+     *
+     * @param task 表示刚刚完成的任务的实例
+     */
     @Override
     public void onAsyncTaskFinish(MTAsyncTask<?, ?, ?> task) {
         Node node = mTaskMap.get(task);
@@ -160,6 +188,9 @@ public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params
     }
 
 
+    /**
+     * 任务编辑器，通过run方法返回这个类，然后可以调用before和after等编辑任务
+     */
     public class Builder {
         private Node mCurrentNode;
 
@@ -187,6 +218,11 @@ public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params
             return this;
         }
 
+        /**
+         * 获得结果参数的映射
+         * @param map 映射实例
+         * @return Builder编辑器
+         */
         public Builder map(ResultMap map) {
             if (map != null) {
                 mCurrentNode.addResultMap(map);
@@ -194,6 +230,11 @@ public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params
             return this;
         }
 
+        /**
+         *
+         * @param task 并行的任务
+         * @return Builder编辑器
+         */
         public Builder with(MTAsyncTask<?, ?, ?> task) {
             Node node = mTaskMap.get(task);
             if (node == null) {
@@ -232,7 +273,9 @@ public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params
 
     }
 
-
+    /**
+     * 包装MtAsyncTask的节点
+     */
     private class Node {
 
 
@@ -241,13 +284,13 @@ public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params
         }
 
         private ResultMap mResultMap;//映射转换接口
-        private MTAsyncTask<?, ?, ?> mAsyncTask;
-        private ArrayList<Node> mTaskChildrenList;
-        private ArrayList<Node> mTaskParentList;
-        private ArrayList<Node> mTaskSibingList;
-        private boolean isTaskFinished = false;
-        private int mParentFinished = 0;
-        private ArrayList<AsyncTask<?, ?, ?>> mFromResult;
+        private MTAsyncTask<?, ?, ?> mAsyncTask;//所包装的任务
+        private ArrayList<Node> mTaskChildrenList;//该节点的孩子集合
+        private ArrayList<Node> mTaskParentList;//该节点的父亲集合
+        private ArrayList<Node> mTaskSibingList;//该节点的兄弟集合
+        private boolean isTaskFinished = false;//该任务是否完成
+        private int mParentFinished = 0;//父类任务完成个数
+        private ArrayList<AsyncTask<?, ?, ?>> mFromResult;//所依赖的结果
 
         public void addParent(Node node) {
             if (mTaskParentList == null) {

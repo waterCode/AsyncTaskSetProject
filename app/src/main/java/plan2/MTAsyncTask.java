@@ -13,14 +13,20 @@ import java.util.concurrent.Executor;
  */
 public abstract class MTAsyncTask<Params,Progress,Result> extends AsyncTask<Params,Progress,Result> {
     private static final String TAG="MTAsyncTask";
-    private Params[] mParamses;
-    private Executor mMtExcutor;
-    private MTAsyncTaskListener mListener;
+    private Params[] mParamses;//执行参数
+    private Executor mMtExcutor;//用于回调任务完成线程池
+    private MTAsyncTaskListener mListener;//回调任务监听
 
 
     {
-        mMtExcutor = new MTExecutor();
+        mMtExcutor = new MTExecutor();//初始化线程池
     }
+
+
+    /**
+     *
+     * @param mListener 监听回调对象
+     */
     public void setAsyncTaskListener(MTAsyncTaskListener mListener) {
         this.mListener = mListener;
     }
@@ -41,7 +47,6 @@ public abstract class MTAsyncTask<Params,Progress,Result> extends AsyncTask<Para
         }
         //处理结果参数
         mParamses = (Params[]) resultParams;
-        // TODO: 2017/7/17 这里应该怎么判断参数类型 
         executeOnExecutor(mMtExcutor,mParamses);//进行强制转换
     }
 
