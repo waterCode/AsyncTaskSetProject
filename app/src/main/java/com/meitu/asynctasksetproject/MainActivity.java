@@ -27,8 +27,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        //进行AWith1限制
-        test10();
+        test13();
     }
 
     void test1() {
@@ -77,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
      * 多任务并行测试
      */
     public void test8(){
-        taskSet1.run(AA).with(BB).with(EE).before(CC);
+        taskSet1.run(AA).with(BB).with(CC).after(EE);
         taskSet1.start();
     }
 
@@ -102,6 +101,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
+
+
     /**
      * 并行任务参数传递
      */
@@ -122,6 +124,58 @@ public class MainActivity extends AppCompatActivity {
 
         taskSet1.start();
     }
+
+    /**
+     * 依赖参数错误
+     */
+    public void test12() {
+        taskSet1.run(AA).after(BB).before(CC);//执行顺序为B，A，C
+        taskSet1.run(AA).from(CC).map(new ResultMap<Object, String>() {//却让A去依赖C，导致A不能执行，直接在获取参数那里挂了，
+
+
+            @Override
+            public String[] map(Object[] result) {
+                String[] s = new String[result.length];
+                for (int i = 0; i < result.length; i++) {
+                    s[i] = (String) result[i];
+                }
+                return s;
+            }
+        });
+
+        taskSet1.start();
+    }
+
+
+    /**
+     * 串行参数传递
+     */
+    public void test13(){
+        taskSet1.run(BB).after(AA).from(AA).map(new ResultMap<Object, String>() {
+
+            @Override
+            public String[] map(Object[] result) {
+                String[] s = new String[result.length];
+                for (int i = 0; i < result.length; i++) {
+                    s[i] = (String) result[i];
+                }
+                return s;
+            }
+        });
+        taskSet1.run(CC).after(BB).from(BB).map(new ResultMap<Object, String>() {
+
+            @Override
+            public String[] map(Object[] result) {
+                String[] s = new String[result.length];
+                for (int i = 0; i < result.length; i++) {
+                    s[i] = (String) result[i];
+                }
+                return s;
+            }
+        });
+        taskSet1.start();
+    }
+
 
 
     class TaskAA extends MTAsyncTask<String, String, String> {

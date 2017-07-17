@@ -81,8 +81,8 @@ public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params
 
     /**
      * 递归实现找出所有的兄弟，比如A和B是兄弟，B和C是兄弟，那么A和C也是兄弟
-     * @param node
-     * @param mTaskSibingList
+     * @param node 所检查的节点
+     * @param mTaskSibingList 存放兄弟集合
      */
     private void findAllSibings(Node node, ArrayList<Node> mTaskSibingList) {
         if (!mTaskSibingList.contains(node)) {//没有这个节点就会加入
@@ -158,7 +158,7 @@ public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params
      * 遍历孩子节点来决定是否开始孩子任务（根据父亲是否都执行完毕）
      * @param task 刚刚完成的任务
      */
-    public void onChildrenTaskEnd(MTAsyncTask<?, ?, ?> task) {
+    private void onChildrenTaskEnd(MTAsyncTask<?, ?, ?> task) {
         Node node = mTaskMap.get(task);
         ArrayList<Node> childrenList = node.mTaskChildrenList;
         if (childrenList == null) {
@@ -279,7 +279,7 @@ public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params
     private class Node {
 
 
-        public Node(MTAsyncTask<?, ?, ?> mAsyncTask) {
+         Node(MTAsyncTask<?, ?, ?> mAsyncTask) {
             this.mAsyncTask = mAsyncTask;
         }
 
@@ -292,7 +292,7 @@ public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params
         private int mParentFinished = 0;//父类任务完成个数
         private ArrayList<AsyncTask<?, ?, ?>> mFromResult;//所依赖的结果
 
-        public void addParent(Node node) {
+        private void addParent(Node node) {
             if (mTaskParentList == null) {
                 mTaskParentList = new ArrayList<>();
             }
@@ -302,7 +302,7 @@ public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params
             }
         }
 
-        public void addFromResult(AsyncTask<?, ?, ?> task) {
+        private void addFromResult(AsyncTask<?, ?, ?> task) {
             if (mFromResult == null) {
                 mFromResult = new ArrayList<>();
             }
@@ -319,7 +319,7 @@ public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params
             }
         }
 
-        public void addChildren(Node node) {
+        private void addChildren(Node node) {
             if (mTaskChildrenList == null) {
                 mTaskChildrenList = new ArrayList<>();
             }
@@ -329,7 +329,7 @@ public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params
             }
         }
 
-        public void addSibing(Node node) {
+        private void addSibing(Node node) {
             if (mTaskSibingList == null) {
                 mTaskSibingList = new ArrayList<>();
             }
@@ -339,7 +339,7 @@ public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params
             }
         }
 
-        public void addParents(ArrayList<Node> parents) {
+        private void addParents(ArrayList<Node> parents) {
             if (parents == null) {
                 return;
             }
@@ -364,7 +364,7 @@ public class MTAsyncTaskSet<Params, Progress, Result> extends MTAsyncTask<Params
 class TestTask extends MTAsyncTask<String, String, String> {
 
 
-    public TestTask(String name) {
+     TestTask(String name) {
         super(name);
     }
 
