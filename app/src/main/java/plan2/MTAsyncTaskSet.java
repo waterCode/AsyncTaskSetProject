@@ -383,7 +383,7 @@ class TestTask extends MTAsyncTask<String, String, String> {
      * @see #publishProgress
      */
     @Override
-    protected String doInBackground(String[] params) {
+    protected String doInBackground(String... params) {
         if (params != null && params.length > 0) {
             Log.d("startTask", "" + params[0]);
         }

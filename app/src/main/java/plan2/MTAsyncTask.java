@@ -41,6 +41,7 @@ public abstract class MTAsyncTask<Params, Progress, Result> extends AsyncTask<Pa
         if (mTaskName != null) {
             Log.d(TAG, "开始运行" + mTaskName);
         }
+        // TODO: 2017/7/17 这里警告
         //处理结果参数
         mParamses = (Params[]) resultParams;
         executeOnExecutor(mMtExcutor, mParamses);//进行强制转换
