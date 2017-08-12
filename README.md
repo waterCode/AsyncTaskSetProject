@@ -1,1 +1,2 @@
+github同步：https://github.com/waterCode
 用法和AnimatorSet几乎一样，思路也是思路AnimatorSet，实现AsyncTask传并行运用，通过after，before，with方法来安排任务的先后和并行
